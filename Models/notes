@@ -1,0 +1,70 @@
+- Inspect Ohio models:
+    - SalaryData table: 
+      - By filtering out profiles with N/A entry_salary, the table size was reduced by a half. Over 50k rows to 20k rows
+      - By using yos-specified salary in 2022, we're able to construct SalaryHeadCountData. It makes the difference as MSPER doesn't publish the same information. Without SalaryHeadCountData, we must compute the start salary for everyone
+    - AnnFactorData:
+      - Doing semi-join with SalaryData sizes down AnnFactorData by a half as well
+      
+    - wf_data:
+      - Ohio's WF model runs fast on my old laptop as well
+      - It used a shorter year_projection. 2022 - 2052, not 2022-2153
+      
+- In PVFB calculation, 
+  - why are we using sep_rate instead of survival_rate?
+  - We are lagging the sep_rate by 2. Is it relevant to that fact that our historical data normally covers the latest two years?
+
+
+Some technique I should consider;
+  -  Memory cache: Instead of saving data into low levels, I save it on RAM. It saves loading time
+  - Just-in-time compilation
+  - loop unrolling
+
+
+
+
+Optimization notes:
+
+- Timing:
+  - Total initial running time was around 12s
+  - get_benefit_data() took nearly 10-11s
+  - The rest was to handle many simple calculations in get_liability_data() and get_funding_data()
+  
+- Profiling:
+  - Using Rprof to see find which functions are time-consuming
+  - Coundn't use Profvis due to instalation issues on mac
+  
+- Optimization techniques:
+  - Remove unnecessary computation:
+    - Annuity factor and Reduce factor have the same structure. Thus, I eliminated the left_join when generating benefit_projection table
+    - Initializing tables with entry_age instead of age
+    - When calculating reduce factor, I focus only on early retirees to save computation time
+  - Memoization
+    - Created a lookup table for retirement_type and is_retire_eligible. Thus, no need to do ifelse() inside subsets of big datasets
+    - When making mortality_rate table, I also created a lookup table
+  - Parallel computation
+    - It's not helpful so far as the additional setup time overweights the saved running time
+  - Compilation
+    - It is the most helpful when computing pvfb and pvfs. It reduces the running time of creating the final_data table from 2.3s to 0.2s
+    - It saves a little time creating mortality_rate
+    - Rcpp is amazing and worth learning, but be careful about its installation
+
+- Data manipulation library:
+  - Data.table vs dplyr:
+    - Normally, data.table codes execute 10-15% faster than dplyr ones, but less readable
+    - Sometimes, the difference is so small that we shouldn't be bothered
+    - While we could optimize specific lines of codes, we should ensure that those codes are closely related. The reason is that data.table and dplyr are different in some ways. Switching between those costs us time
+    
+- Output:
+  - The running time decreases from 12s to 5s for the particular model of MSPERS
+  - If the yos-level salary information was available, it would have been 3s. The reason is that the table size would be technically reduced by a half
+  - It takes 1s to run the other functions beside get_benefit_data()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
