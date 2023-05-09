@@ -12,7 +12,7 @@ chart1 <- read_xlsx(paste0(file_path, data_file), sheet = "UAL-MVA")
 chart1 |>
   dplyr::filter(Year >= 2020) |>
   dplyr::mutate(Year = as.character(Year)) |>
-  e_charts(Year, renderer = "svg", height = 375, areaStyle = list(opacity = 1)) |> # You can adjust height here
+  e_charts(Year, renderer = "svg", height = 750, areaStyle = list(opacity = 1)) |> # You can adjust height here
   e_line(ADC_w_Assumed_ROA,
          name = "ADEC - Assumed Return",
          # color="green",

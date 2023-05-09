@@ -7,10 +7,10 @@ library(readxl)
 file_path <- getwd()
 data_file <- "/Charts/chart_inputs.xlsx"
 theme_file <- "/Charts/echarts_theme.json"
-chart1 <- read_xlsx(paste0(file_path, data_file), sheet = "ER Contr Amount")
+chart1 <- read_xlsx(paste0(file_path, data_file), sheet = "ER All-in Cost")
 
 chart1 |>
-  dplyr::filter(Year >= 2020) |>
+  dplyr::filter(Year >= 2023) |>
   dplyr::mutate(Year = as.character(Year)) |>
   e_charts(Year, renderer = "svg", height = 750, areaStyle = list(opacity = 1)) |> # You can adjust height here
   e_line(ADC_w_Assumed_ROA,
@@ -41,7 +41,7 @@ chart1 |>
   ) |>
   echarts4r::e_y_axis(
     # name = "Funded Ratio (MVA Basis)",
-    max = 8000,
+    max = 70000,
     min = 0,
     offset = 0,
     axisTick = list(show = T, length = 30, lineStyle = list(color = "#d3d3d3bf")),
@@ -79,7 +79,7 @@ chart1 |>
     icons = c("circle", "circle", "circle", "circle")
   ) |>
   e_title(
-    text = "Employer Contribution Amount ($)",
+    text = "Employer All-in Cost ($)",
     left = "0%",
     top = "0%",
     textStyle = list(fontSize = 16, fontWeight = "bold")
