@@ -13,24 +13,24 @@ chart1 |>
   dplyr::filter(Year >= 2023) |>
   dplyr::mutate(Year = as.character(Year)) |>
   e_charts(Year, renderer = "svg", height = 750, areaStyle = list(opacity = 1)) |> # You can adjust height here
+  e_line(SQ_w_Assumed_ROA,
+         name = "Status Quo - Assumed Return",
+         symbol = "none",
+         lineStyle = list(width = 3)
+  ) |>
   e_line(ADC_w_Assumed_ROA,
          name = "ADEC - Assumed Return",
          # color="green",
          symbol = "none",
          lineStyle = list(width = 3)
   ) |>
-  e_line(ADC_w_RecurringRecession_ROA,
-         name = "ADEC - Double Recession",
-         symbol = "none",
-         lineStyle = list(width = 3)
-  ) |>
-  e_line(SQ_w_Assumed_ROA,
-         name = "Status Quo - Assumed Return",
-         symbol = "none",
-         lineStyle = list(width = 3)
-  ) |>
   e_line(SQ_w_RecurringRecession_ROA,
          name = "Status Quo - Double Recession",
+         symbol = "none",
+         lineStyle = list(width = 3)
+  ) |>
+  e_line(ADC_w_RecurringRecession_ROA,
+         name = "ADEC - Double Recession",
          symbol = "none",
          lineStyle = list(width = 3)
   ) |>
