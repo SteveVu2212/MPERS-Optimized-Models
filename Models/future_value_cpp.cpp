@@ -75,9 +75,9 @@ NumericVector opt_PVFS_rcpp(NumericVector remaining_prob_vec, NumericVector inte
   int n = sal_vec.size();
   NumericVector PVFS(n);
   for (int i = 0; i < n; i++){
-    NumericVector remaining_prob_og = remaining_prob_vec[seq(i, n)];
+    NumericVector remaining_prob_og = remaining_prob_vec[seq(i, n-1)];
     NumericVector remaining_prob = remaining_prob_og / remaining_prob_og[0];
-    NumericVector sal = sal_vec[seq(i, n)];
+    NumericVector sal = sal_vec[seq(i, n-1)];
     NumericVector sal_adjusted = sal * remaining_prob;
     PVFS[i] = get_npv_rcpp(interest[i], sal_adjusted);
   }

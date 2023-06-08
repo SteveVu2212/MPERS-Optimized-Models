@@ -19,7 +19,7 @@ credited_interest_ <- 0.02
 ee_contr_rate_ <- 0.09
 cola_ <- 0.03
 req_er_contr_pct <- 0.86
-Admin_Exp_Pct <- 0.00
+Admin_Exp_Pct <- 0.0028
 AmoBaseInc_CurrentHire <- 0.0265
 AmoBaseInc_NewHire <- 0.0265
 

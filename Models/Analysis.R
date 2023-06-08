@@ -43,7 +43,7 @@ det_ADC_recur_recession <-  memoised_get_funding_data(
 
 
 
-file_path = "/Users/anhtu/Documents/Reason Org/Actuarial Modeling Projects/Mississippi PERS/Mississippi-PERS-modeling-Steve-Github/Outputs/"
+file_path = "/Users/anhtu/Documents/Reason Org/Actuarial Modeling Projects/Mississippi PERS/MPERS-Optimized-Models-Steve-Github/Outputs/"
 write.xlsx(det_SQ_assumption, file=paste0(file_path, "det_SQ_assumption.xlsx"))
 write.xlsx(det_SQ_recur_recession, file=paste0(file_path, "det_SQ_recur_recession.xlsx"))
 write.xlsx(det_ADC_assumption, file=paste0(file_path, "det_ADC_assumption.xlsx"))

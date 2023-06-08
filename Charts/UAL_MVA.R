@@ -79,7 +79,7 @@ chart1 |>
     icons = c("circle", "circle", "circle", "circle")
   ) |>
   e_title(
-    text = "UAL-MVA ($)",
+    text = "UAL-MVA ($ Millions)",
     left = "0%",
     top = "0%",
     textStyle = list(fontSize = 16, fontWeight = "bold")

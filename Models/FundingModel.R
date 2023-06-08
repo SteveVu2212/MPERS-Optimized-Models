@@ -228,12 +228,19 @@ get_funding_data <- function(
     curr_hire_ER_amo_contr[i] <- curr_hire_payroll[i] * curr_hire_ER_amo_rate[i]*req_er_contr_pct
     new_hire_ER_amo_contr[i] <- new_hire_payroll[i] * new_hire_ER_amo_rate[i]*req_er_contr_pct
     
-    # get ER total contribution
-    # total_hire_ER_total_contr[i] <- (curr_hire_ER_nc_contr[i] + new_hire_ER_nc_contr[i]) +
-    #                                 (curr_hire_ER_amo_contr[i] + new_hire_ER_amo_contr[i])
-    # 
-    # total_hire_ER_contr_rate[i] <- total_hire_ER_total_contr[i] / (total_hire_payroll[i]*req_er_contr_pct)
+    # get ER total contribution and cumulative ER total contribution
+    total_hire_ER_contr[i] <- (curr_hire_ER_nc_contr[i] + new_hire_ER_nc_contr[i]) +
+                              (curr_hire_ER_amo_contr[i] + new_hire_ER_amo_contr[i]) +
+                              Admin_Exp_Pct * total_hire_payroll[i]
     
+    total_hire_ER_contr_real[i] <- total_hire_ER_contr[i] / (1 + assum_inflation_)^(Year[i] - year_start)
+    
+    if (Year[i] == year_start + 1) {
+      cum_total_hire_ER_contr_real[i] <- total_hire_ER_contr_real[i]
+    } else {
+      cum_total_hire_ER_contr_real[i] <- cum_total_hire_ER_contr_real[i-1] + total_hire_ER_contr_real[i]
+    }
+
     # get net cash flow
     total_hire_net_cash_flow[i] <- total_hire_benefit[i] + total_hire_refund[i] + total_hire_admin_exp[i] + 
                                   (curr_hire_EE_nc_contr[i] + new_hire_EE_nc_contr[i]) +
@@ -336,7 +343,12 @@ get_funding_data <- function(
     
     funded_ratio_mva[i] <- total_hire_actual_mva[i] / total_hire_aal[i]
     funded_ratio_ava[i] <- total_hire_ava[i] / total_hire_aal[i]
+    
+    # all-in employer cost analysis
+    total_hire_ual_mva_real[i] <- total_hire_ual_mva[i] / (1 + assum_inflation_)^(Year[i] - year_start)
+    total_hire_ER_all_in_cost_real[i] <- cum_total_hire_ER_contr_real[i] + total_hire_ual_mva_real[i]
       
+    # amortization
     row_indx <- i - (start_proj_year - start_hist_year) # Adjust row index to fit three amo matrices
     for(j in 1:end_col){
       if(curr_hire_amo_period_matrix[row_indx,j] != 0){
