@@ -1,13 +1,13 @@
 
 # liability_data <- readRDS("./Models/projected_liabilities.rds")
 
-# curr_discount_rate = curr_discount_rate_,
-# new_discount_rate = new_discount_rate_,
-# cola = cola_,
-# retire_refund_ratio = retire_refund_ratio_,
-# funding_policy = funding_policy_,
-# analysis_type = analysis_type_,
-# roa_scenario = roa_scenario_
+curr_disc_rate = 0.0755
+new_disc_rate = 0.0755
+cola = cola_
+retire_refund_ratio = retire_refund_ratio_
+funding_policy = funding_policy_
+analysis_type = analysis_type_
+roa_scenario = roa_scenario_
 
 get_funding_data <- function(
     curr_disc_rate,
@@ -102,7 +102,7 @@ get_funding_data <- function(
     total_hire_admin_exp <- curr_hire_admin_exp + new_hire_admin_exp
     
     
-    # Normal cost
+    # Normal cost calibration
     curr_hire_nc_rate <- c(curr_hire_nc_rate_, liability_data$nc_rate_legacy_est * nc_calibration_ratio)
     new_hire_nc_rate <- c(0, liability_data$nc_rate_new_est * nc_calibration_ratio)
     
@@ -111,8 +111,10 @@ get_funding_data <- function(
     
     total_hire_nc_contr <- curr_hire_nc_contr + new_hire_nc_contr
   
+    # AAL and UAAL calibration
+    curr_hire_aal[2] <- liability_data$AAL_legacy_est[1] * (10^(-6))
+    total_hire_ual_ava[2] <- liability_data$AAL_est[1] * (10^(-6)) - total_hire_ava[2]
     
-    # AAL
     for(i in first_proj_yr_idx:length(curr_hire_aal)){
       curr_hire_aal[i] <- curr_hire_aal[i-1] * (1 + curr_discount_rate[i]) + 
                                   curr_hire_nc_contr[i] * (1 + curr_discount_rate[i])^(1/2) + 
@@ -215,275 +217,277 @@ get_funding_data <- function(
     adc <- rep(0,25)
     adc_fcr_ratio <- rep(0,25)
     
-  for(i in first_proj_yr_idx:period){
-    # for(i in first_proj_yr_idx:first_proj_yr_idx){
-      
-    Year[i] <- Year[i-1] + 1
+    ################### Projections ##########################
     
-    # get amortization rates
-    curr_hire_ER_amo_rate[i] <- curr_hire_ER_contr_rate[i-2] - curr_hire_ER_nc_rate[i] - Admin_Exp_Pct
-    new_hire_ER_amo_rate[i] <- new_hire_ER_contr_rate[i-2] - new_hire_ER_nc_rate[i] - Admin_Exp_Pct
-    
-    # get amortization contribution amount
-    curr_hire_ER_amo_contr[i] <- curr_hire_payroll[i] * curr_hire_ER_amo_rate[i]*req_er_contr_pct
-    new_hire_ER_amo_contr[i] <- new_hire_payroll[i] * new_hire_ER_amo_rate[i]*req_er_contr_pct
-    
-    # get ER total contribution and cumulative ER total contribution
-    total_hire_ER_contr[i] <- (curr_hire_ER_nc_contr[i] + new_hire_ER_nc_contr[i]) +
-                              (curr_hire_ER_amo_contr[i] + new_hire_ER_amo_contr[i]) +
-                              Admin_Exp_Pct * total_hire_payroll[i]
-    
-    total_hire_ER_contr_real[i] <- total_hire_ER_contr[i] / (1 + assum_inflation_)^(Year[i] - year_start)
-    
-    if (Year[i] == year_start + 1) {
-      cum_total_hire_ER_contr_real[i] <- total_hire_ER_contr_real[i]
-    } else {
-      cum_total_hire_ER_contr_real[i] <- cum_total_hire_ER_contr_real[i-1] + total_hire_ER_contr_real[i]
-    }
-
-    # get net cash flow
-    total_hire_net_cash_flow[i] <- total_hire_benefit[i] + total_hire_refund[i] + total_hire_admin_exp[i] + 
-                                  (curr_hire_EE_nc_contr[i] + new_hire_EE_nc_contr[i]) +
-                                  (curr_hire_ER_nc_contr[i] + new_hire_ER_nc_contr[i]) +
-                                  (curr_hire_ER_amo_contr[i] + new_hire_ER_amo_contr[i])
-    
-    curr_hire_net_cash_flow[i] <- curr_hire_benefit[i] + curr_hire_refund[i] + curr_hire_admin_exp[i] + 
-                                  curr_hire_EE_nc_contr[i] + curr_hire_ER_nc_contr[i] + curr_hire_ER_amo_contr[i]
-    
-    new_hire_net_cash_flow[i] <- new_hire_benefit[i] + new_hire_refund[i] + new_hire_admin_exp[i] +
-                                  new_hire_EE_nc_contr[i] + new_hire_ER_nc_contr[i] + new_hire_ER_amo_contr[i]
-    
-    # get actual mva
-    total_hire_actual_mva[i] <- total_hire_actual_mva[i-1]*(1 + roa_mva[i]) +
-                                (total_hire_benefit[i] + total_hire_refund[i] + total_hire_admin_exp[i] +
-                                 curr_hire_EE_nc_contr[i] + new_hire_EE_nc_contr[i] +
-                                 curr_hire_ER_nc_contr[i] + new_hire_ER_nc_contr[i] +
-                                 curr_hire_ER_amo_contr[i] + new_hire_ER_amo_contr[i])*(1 + roa_mva[i])^(1/2)
-    
-    curr_hire_actual_mva[i] <- curr_hire_actual_mva[i-1]*(1 + roa_mva[i]) + curr_hire_net_cash_flow[i]*(1 + roa_mva[i])^(1/2)
-    new_hire_actual_mva[i] <- new_hire_actual_mva[i-1]*(1 + roa_mva[i]) + new_hire_net_cash_flow[i]*(1 + roa_mva[i])^(1/2)
-    
-    # get expected investment income
-    total_hire_exp_invest_inco[i] <- total_hire_actual_mva[i-1]*new_discount_rate[i] + total_hire_net_cash_flow[i]*new_discount_rate[i]/2 
-    curr_hire_exp_invest_inco[i] <- curr_hire_actual_mva[i-1]*new_discount_rate[i] + curr_hire_net_cash_flow[i]*new_discount_rate[i]/2 
-    new_hire_exp_invest_inco[i] <- new_hire_actual_mva[i-1]*new_discount_rate[i] + new_hire_net_cash_flow[i]*new_discount_rate[i]/2 
-    
-    # get expected mva
-    total_hire_exp_mva[i] <- total_hire_actual_mva[i-1] + total_hire_net_cash_flow[i] + total_hire_exp_invest_inco[i]
-    curr_hire_exp_mva[i] <- curr_hire_actual_mva[i-1] + curr_hire_net_cash_flow[i] + curr_hire_exp_invest_inco[i]
-    new_hire_exp_mva[i] <- new_hire_actual_mva[i-1] + new_hire_net_cash_flow[i] + new_hire_exp_invest_inco[i]
-    
-    # get gain and loss
-    total_hire_gain_loss[i] <- total_hire_actual_mva[i] - total_hire_exp_mva[i]
-    curr_hire_gain_loss[i] <- curr_hire_actual_mva[i] - curr_hire_exp_mva[i]
-    new_hire_gain_loss[i] <- new_hire_actual_mva[i] - new_hire_exp_mva[i]
-    
-    # get deferred gain and loss
-    total_hire_recog_gain_loss_1st_yr[i] <- total_hire_gain_loss[i]*0.2
-    total_hire_recog_gain_loss_2nd_yr[i] <- total_hire_recog_gain_loss_1st_yr[i-1]
-    total_hire_recog_gain_loss_3rd_yr[i] <- total_hire_recog_gain_loss_2nd_yr[i-1]
-    total_hire_recog_gain_loss_4th_yr[i] <- total_hire_recog_gain_loss_3rd_yr[i-1]
-    total_hire_recog_gain_loss_5th_yr[i] <- total_hire_recog_gain_loss_4th_yr[i-1]
-    
-    total_hire_total_recog_gain_loss[i] <- total_hire_recog_gain_loss_1st_yr[i] + 
-                                            total_hire_recog_gain_loss_2nd_yr[i] +
-                                            total_hire_recog_gain_loss_3rd_yr[i] +
-                                            total_hire_recog_gain_loss_4th_yr[i] +
-                                            total_hire_recog_gain_loss_5th_yr[i]
-    
-    curr_hire_recog_gain_loss_1st_yr[i] <- curr_hire_gain_loss[i]*0.2
-    curr_hire_recog_gain_loss_2nd_yr[i] <- curr_hire_recog_gain_loss_1st_yr[i-1]
-    curr_hire_recog_gain_loss_3rd_yr[i] <- curr_hire_recog_gain_loss_2nd_yr[i-1]
-    curr_hire_recog_gain_loss_4th_yr[i] <- curr_hire_recog_gain_loss_3rd_yr[i-1]
-    curr_hire_recog_gain_loss_5th_yr[i] <- curr_hire_recog_gain_loss_4th_yr[i-1]
-    
-    curr_hire_total_recog_gain_loss[i] <- curr_hire_recog_gain_loss_1st_yr[i] + 
-                                          curr_hire_recog_gain_loss_2nd_yr[i] +
-                                          curr_hire_recog_gain_loss_3rd_yr[i] +
-                                          curr_hire_recog_gain_loss_4th_yr[i] +
-                                          curr_hire_recog_gain_loss_5th_yr[i]
-    
-    new_hire_recog_gain_loss_1st_yr[i] <- new_hire_gain_loss[i]*0.2
-    new_hire_recog_gain_loss_2nd_yr[i] <- new_hire_recog_gain_loss_1st_yr[i-1]
-    new_hire_recog_gain_loss_3rd_yr[i] <- new_hire_recog_gain_loss_2nd_yr[i-1]
-    new_hire_recog_gain_loss_4th_yr[i] <- new_hire_recog_gain_loss_3rd_yr[i-1]
-    new_hire_recog_gain_loss_5th_yr[i] <- new_hire_recog_gain_loss_4th_yr[i-1]
-    
-    new_hire_total_recog_gain_loss[i] <- new_hire_recog_gain_loss_1st_yr[i] + 
-                                          new_hire_recog_gain_loss_2nd_yr[i] +
-                                          new_hire_recog_gain_loss_3rd_yr[i] +
-                                          new_hire_recog_gain_loss_4th_yr[i] +
-                                          new_hire_recog_gain_loss_5th_yr[i]
-    
-    # get ava
-    total_hire_ava[i] <- min(total_hire_actual_mva[i] * 1.2,
-                            max(total_hire_ava[i-1] + total_hire_net_cash_flow[i] + 
-                                  total_hire_exp_invest_inco[i] + total_hire_total_recog_gain_loss[i],
-                        total_hire_actual_mva[i] * 0.8))
-    
-    curr_hire_ava[i] <- min(curr_hire_actual_mva[i] * 1.2,
-                             max(curr_hire_ava[i-1] + curr_hire_net_cash_flow[i] + 
-                                   curr_hire_exp_invest_inco[i] + curr_hire_total_recog_gain_loss[i],
-                                 curr_hire_actual_mva[i] * 0.8))
-    
-    new_hire_ava[i] <- min(new_hire_actual_mva[i] * 1.2,
-                             max(new_hire_ava[i-1] + new_hire_net_cash_flow[i] + 
-                                   new_hire_exp_invest_inco[i] + new_hire_total_recog_gain_loss[i],
-                                 new_hire_actual_mva[i] * 0.8))
-    
-    # get ual_ava
-    total_hire_ual_ava[i] <- total_hire_aal[i] - total_hire_ava[i]
-    curr_hire_ual_ava[i] <- curr_hire_aal[i] - curr_hire_ava[i]
-    new_hire_ual_ava[i] <- new_hire_aal[i] - new_hire_ava[i]
-    
-    # get ual_mva
-    total_hire_ual_mva[i] <- total_hire_aal[i] - total_hire_actual_mva[i]
-    curr_hire_ual_mva[i] <- curr_hire_aal[i] - curr_hire_actual_mva[i]
-    new_hire_ual_mva[i] <- new_hire_aal[i] - new_hire_actual_mva[i]
-    
-    funded_ratio_mva[i] <- total_hire_actual_mva[i] / total_hire_aal[i]
-    funded_ratio_ava[i] <- total_hire_ava[i] / total_hire_aal[i]
-    
-    # all-in employer cost analysis
-    total_hire_ual_mva_real[i] <- total_hire_ual_mva[i] / (1 + assum_inflation_)^(Year[i] - year_start)
-    total_hire_ER_all_in_cost_real[i] <- cum_total_hire_ER_contr_real[i] + total_hire_ual_mva_real[i]
-      
-    # amortization
-    row_indx <- i - (start_proj_year - start_hist_year) # Adjust row index to fit three amo matrices
-    for(j in 1:end_col){
-      if(curr_hire_amo_period_matrix[row_indx,j] != 0){
-        curr_hire_amo_payment_matrix[row_indx, j] <- get_pmt(
-                                                  r=new_discount_rate[i],
-                                                  g = AmoBaseInc_CurrentHire,
-                                                  nper = curr_hire_amo_period_matrix[row_indx,j],
-                                                  pv = curr_hire_remaining_ual_matrix[row_indx,j],
-                                                  t=0.5)
-      }
-    }
-    
-    for(j in 1:end_col){
-      if(new_hire_amo_period_matrix[row_indx,j] != 0){
-        new_hire_amo_payment_matrix[row_indx, j] <- get_pmt(
-                                                  r = new_discount_rate[i],
-                                                  g = AmoBaseInc_CurrentHire,
-                                                  nper = new_hire_amo_period_matrix[row_indx,j],
-                                                  pv = new_hire_remaining_ual_matrix[row_indx,j],
-                                                  t=0.5)
-      }
-    }
-    
-    end_col <- min(end_col + 1, 30)
-    
-    for(k in 2:end_col){
-      curr_hire_remaining_ual_matrix[row_indx+1,k] <- curr_hire_remaining_ual_matrix[row_indx,k-1]*(1 + new_discount_rate[i]) - 
-                                            curr_hire_amo_payment_matrix[row_indx,k-1]*(1 + new_discount_rate[i])^(1/2)
-      
-      new_hire_remaining_ual_matrix[row_indx+1,k] <- new_hire_remaining_ual_matrix[row_indx,k-1]*(1 + new_discount_rate[i]) - 
-                                            new_hire_amo_payment_matrix[row_indx,k-1]*(1 + new_discount_rate[i])^(1/2)
-    }
-    
-    curr_hire_remaining_ual_matrix[row_indx+1,1] <- curr_hire_ual_ava[i] - sum(curr_hire_remaining_ual_matrix[(row_indx+1),2:end_col])
-    new_hire_remaining_ual_matrix[row_indx+1,1] <- new_hire_ual_ava[i] - sum(new_hire_remaining_ual_matrix[(row_indx+1),2:end_col])
-    
-    # get amortization contribution rate
-    # curr_hire_actuarial_amo_rate <- get_actuarial_amo_rate(annual_amo_payment = sum(curr_hire_amo_payment_matrix[row_indx,]),
-    #                                              annual_payroll = curr_hire_payroll[i])
-
-    # new_hire_actuarial_amo_rate <- get_actuarial_amo_rate(annual_amo_payment = sum(new_hire_amo_payment_matrix[row_indx,]),
-    #                                                        annual_payroll = new_hire_payroll[i])
-    
-    total_hire_actuarial_amo_rate <- get_actuarial_amo_rate(
-                  annual_amo_payment = sum(curr_hire_amo_payment_matrix[row_indx,]) + sum(new_hire_amo_payment_matrix[row_indx,]),
-                  annual_payroll = total_hire_payroll[i])
-    
-    # get ADC rates
-    curr_hire_adc_rate <- get_adc_rate(
-                                  # actuarial_amo_rate = curr_hire_actuarial_amo_rate,
-                                  actuarial_amo_rate = total_hire_actuarial_amo_rate,
-                                  ER_nc_rate = curr_hire_ER_nc_rate[i], admin_rate = Admin_Exp_Pct)
-    
-    new_hire_adc_rate <- get_adc_rate(
-                                  # actuarial_amo_rate = new_hire_actuarial_amo_rate,
-                                  actuarial_amo_rate = total_hire_actuarial_amo_rate,
-                                  ER_nc_rate = new_hire_ER_nc_rate[i], admin_rate = Admin_Exp_Pct)
-      
-    if(funding_policy == 'status quo'){
-      # determine the total contribution rate next year
-      next_year <- i + start_hist_year - 1
-      
-      if(next_year > 2047){
+    for(i in first_proj_yr_idx:period){
+      # for(i in first_proj_yr_idx:first_proj_yr_idx){
         
-        curr_hire_ER_contr_rate[i] <- curr_hire_ER_contr_rate[i-1]
-        new_hire_ER_contr_rate[i] <- new_hire_ER_contr_rate[i-1]
-        total_hire_ER_contr_rate[i] <- (curr_hire_ER_contr_rate[i] * curr_hire_payroll[i] + 
-                                          new_hire_ER_contr_rate[i] * new_hire_payroll[i]) / total_hire_payroll[i]
-        
+      Year[i] <- Year[i-1] + 1
+      
+      # get amortization rates
+      curr_hire_ER_amo_rate[i] <- curr_hire_ER_contr_rate[i-2] - curr_hire_ER_nc_rate[i] - Admin_Exp_Pct
+      new_hire_ER_amo_rate[i] <- new_hire_ER_contr_rate[i-2] - new_hire_ER_nc_rate[i] - Admin_Exp_Pct
+      
+      # get amortization contribution amount
+      curr_hire_ER_amo_contr[i] <- curr_hire_payroll[i] * curr_hire_ER_amo_rate[i]*req_er_contr_pct
+      new_hire_ER_amo_contr[i] <- new_hire_payroll[i] * new_hire_ER_amo_rate[i]*req_er_contr_pct
+      
+      # get ER total contribution and cumulative ER total contribution
+      total_hire_ER_contr[i] <- (curr_hire_ER_nc_contr[i] + new_hire_ER_nc_contr[i]) +
+                                (curr_hire_ER_amo_contr[i] + new_hire_ER_amo_contr[i]) +
+                                Admin_Exp_Pct * total_hire_payroll[i]
+      
+      total_hire_ER_contr_real[i] <- total_hire_ER_contr[i] / (1 + assum_inflation_)^(Year[i] - year_start)
+      
+      if (Year[i] == year_start + 1) {
+        cum_total_hire_ER_contr_real[i] <- total_hire_ER_contr_real[i]
       } else {
+        cum_total_hire_ER_contr_real[i] <- cum_total_hire_ER_contr_real[i-1] + total_hire_ER_contr_real[i]
+      }
+    
+      # get net cash flow
+      total_hire_net_cash_flow[i] <- total_hire_benefit[i] + total_hire_refund[i] + total_hire_admin_exp[i] + 
+                                    (curr_hire_EE_nc_contr[i] + new_hire_EE_nc_contr[i]) +
+                                    (curr_hire_ER_nc_contr[i] + new_hire_ER_nc_contr[i]) +
+                                    (curr_hire_ER_amo_contr[i] + new_hire_ER_amo_contr[i])
+      
+      curr_hire_net_cash_flow[i] <- curr_hire_benefit[i] + curr_hire_refund[i] + curr_hire_admin_exp[i] + 
+                                    curr_hire_EE_nc_contr[i] + curr_hire_ER_nc_contr[i] + curr_hire_ER_amo_contr[i]
+      
+      new_hire_net_cash_flow[i] <- new_hire_benefit[i] + new_hire_refund[i] + new_hire_admin_exp[i] +
+                                    new_hire_EE_nc_contr[i] + new_hire_ER_nc_contr[i] + new_hire_ER_amo_contr[i]
+      
+      # get actual mva
+      total_hire_actual_mva[i] <- total_hire_actual_mva[i-1]*(1 + roa_mva[i]) +
+                                  (total_hire_benefit[i] + total_hire_refund[i] + total_hire_admin_exp[i] +
+                                   curr_hire_EE_nc_contr[i] + new_hire_EE_nc_contr[i] +
+                                   curr_hire_ER_nc_contr[i] + new_hire_ER_nc_contr[i] +
+                                   curr_hire_ER_amo_contr[i] + new_hire_ER_amo_contr[i])*(1 + roa_mva[i])^(1/2)
+      
+      curr_hire_actual_mva[i] <- curr_hire_actual_mva[i-1]*(1 + roa_mva[i]) + curr_hire_net_cash_flow[i]*(1 + roa_mva[i])^(1/2)
+      new_hire_actual_mva[i] <- new_hire_actual_mva[i-1]*(1 + roa_mva[i]) + new_hire_net_cash_flow[i]*(1 + roa_mva[i])^(1/2)
+      
+      # get expected investment income
+      total_hire_exp_invest_inco[i] <- total_hire_actual_mva[i-1]*new_discount_rate[i] + total_hire_net_cash_flow[i]*new_discount_rate[i]/2 
+      curr_hire_exp_invest_inco[i] <- curr_hire_actual_mva[i-1]*new_discount_rate[i] + curr_hire_net_cash_flow[i]*new_discount_rate[i]/2 
+      new_hire_exp_invest_inco[i] <- new_hire_actual_mva[i-1]*new_discount_rate[i] + new_hire_net_cash_flow[i]*new_discount_rate[i]/2 
+      
+      # get expected mva
+      total_hire_exp_mva[i] <- total_hire_actual_mva[i-1] + total_hire_net_cash_flow[i] + total_hire_exp_invest_inco[i]
+      curr_hire_exp_mva[i] <- curr_hire_actual_mva[i-1] + curr_hire_net_cash_flow[i] + curr_hire_exp_invest_inco[i]
+      new_hire_exp_mva[i] <- new_hire_actual_mva[i-1] + new_hire_net_cash_flow[i] + new_hire_exp_invest_inco[i]
+      
+      # get gain and loss
+      total_hire_gain_loss[i] <- total_hire_actual_mva[i] - total_hire_exp_mva[i]
+      curr_hire_gain_loss[i] <- curr_hire_actual_mva[i] - curr_hire_exp_mva[i]
+      new_hire_gain_loss[i] <- new_hire_actual_mva[i] - new_hire_exp_mva[i]
+      
+      # get deferred gain and loss
+      total_hire_recog_gain_loss_1st_yr[i] <- total_hire_gain_loss[i]*0.2
+      total_hire_recog_gain_loss_2nd_yr[i] <- total_hire_recog_gain_loss_1st_yr[i-1]
+      total_hire_recog_gain_loss_3rd_yr[i] <- total_hire_recog_gain_loss_2nd_yr[i-1]
+      total_hire_recog_gain_loss_4th_yr[i] <- total_hire_recog_gain_loss_3rd_yr[i-1]
+      total_hire_recog_gain_loss_5th_yr[i] <- total_hire_recog_gain_loss_4th_yr[i-1]
+      
+      total_hire_total_recog_gain_loss[i] <- total_hire_recog_gain_loss_1st_yr[i] + 
+                                              total_hire_recog_gain_loss_2nd_yr[i] +
+                                              total_hire_recog_gain_loss_3rd_yr[i] +
+                                              total_hire_recog_gain_loss_4th_yr[i] +
+                                              total_hire_recog_gain_loss_5th_yr[i]
+      
+      curr_hire_recog_gain_loss_1st_yr[i] <- curr_hire_gain_loss[i]*0.2
+      curr_hire_recog_gain_loss_2nd_yr[i] <- curr_hire_recog_gain_loss_1st_yr[i-1]
+      curr_hire_recog_gain_loss_3rd_yr[i] <- curr_hire_recog_gain_loss_2nd_yr[i-1]
+      curr_hire_recog_gain_loss_4th_yr[i] <- curr_hire_recog_gain_loss_3rd_yr[i-1]
+      curr_hire_recog_gain_loss_5th_yr[i] <- curr_hire_recog_gain_loss_4th_yr[i-1]
+      
+      curr_hire_total_recog_gain_loss[i] <- curr_hire_recog_gain_loss_1st_yr[i] + 
+                                            curr_hire_recog_gain_loss_2nd_yr[i] +
+                                            curr_hire_recog_gain_loss_3rd_yr[i] +
+                                            curr_hire_recog_gain_loss_4th_yr[i] +
+                                            curr_hire_recog_gain_loss_5th_yr[i]
+      
+      new_hire_recog_gain_loss_1st_yr[i] <- new_hire_gain_loss[i]*0.2
+      new_hire_recog_gain_loss_2nd_yr[i] <- new_hire_recog_gain_loss_1st_yr[i-1]
+      new_hire_recog_gain_loss_3rd_yr[i] <- new_hire_recog_gain_loss_2nd_yr[i-1]
+      new_hire_recog_gain_loss_4th_yr[i] <- new_hire_recog_gain_loss_3rd_yr[i-1]
+      new_hire_recog_gain_loss_5th_yr[i] <- new_hire_recog_gain_loss_4th_yr[i-1]
+      
+      new_hire_total_recog_gain_loss[i] <- new_hire_recog_gain_loss_1st_yr[i] + 
+                                            new_hire_recog_gain_loss_2nd_yr[i] +
+                                            new_hire_recog_gain_loss_3rd_yr[i] +
+                                            new_hire_recog_gain_loss_4th_yr[i] +
+                                            new_hire_recog_gain_loss_5th_yr[i]
+      
+      # get ava
+      total_hire_ava[i] <- min(total_hire_actual_mva[i] * 1.2,
+                              max(total_hire_ava[i-1] + total_hire_net_cash_flow[i] + 
+                                    total_hire_exp_invest_inco[i] + total_hire_total_recog_gain_loss[i],
+                          total_hire_actual_mva[i] * 0.8))
+      
+      curr_hire_ava[i] <- min(curr_hire_actual_mva[i] * 1.2,
+                               max(curr_hire_ava[i-1] + curr_hire_net_cash_flow[i] + 
+                                     curr_hire_exp_invest_inco[i] + curr_hire_total_recog_gain_loss[i],
+                                   curr_hire_actual_mva[i] * 0.8))
+      
+      new_hire_ava[i] <- min(new_hire_actual_mva[i] * 1.2,
+                               max(new_hire_ava[i-1] + new_hire_net_cash_flow[i] + 
+                                     new_hire_exp_invest_inco[i] + new_hire_total_recog_gain_loss[i],
+                                   new_hire_actual_mva[i] * 0.8))
+      
+      # get ual_ava
+      total_hire_ual_ava[i] <- total_hire_aal[i] - total_hire_ava[i]
+      curr_hire_ual_ava[i] <- curr_hire_aal[i] - curr_hire_ava[i]
+      new_hire_ual_ava[i] <- new_hire_aal[i] - new_hire_ava[i]
+      
+      # get ual_mva
+      total_hire_ual_mva[i] <- total_hire_aal[i] - total_hire_actual_mva[i]
+      curr_hire_ual_mva[i] <- curr_hire_aal[i] - curr_hire_actual_mva[i]
+      new_hire_ual_mva[i] <- new_hire_aal[i] - new_hire_actual_mva[i]
+      
+      funded_ratio_mva[i] <- total_hire_actual_mva[i] / total_hire_aal[i]
+      funded_ratio_ava[i] <- total_hire_ava[i] / total_hire_aal[i]
+      
+      # all-in employer cost analysis
+      total_hire_ual_mva_real[i] <- total_hire_ual_mva[i] / (1 + assum_inflation_)^(Year[i] - year_start)
+      total_hire_ER_all_in_cost_real[i] <- cum_total_hire_ER_contr_real[i] + total_hire_ual_mva_real[i]
         
-        # get funded ratio in 2047
-        payrolls <- payroll_matrix[i:critical_year_indx,]
-        cash_flow_excl_amo_ <- cash_flow_excl_amo[i:critical_year_indx]
+      # amortization
+      row_indx <- i - (start_proj_year - start_hist_year) # Adjust row index to fit three amo matrices
+      for(j in 1:end_col){
+        if(curr_hire_amo_period_matrix[row_indx,j] != 0){
+          curr_hire_amo_payment_matrix[row_indx, j] <- get_pmt(
+                                                    r=new_discount_rate[i],
+                                                    g = AmoBaseInc_CurrentHire,
+                                                    nper = curr_hire_amo_period_matrix[row_indx,j],
+                                                    pv = curr_hire_remaining_ual_matrix[row_indx,j],
+                                                    t=0.5)
+        }
+      }
+      
+      for(j in 1:end_col){
+        if(new_hire_amo_period_matrix[row_indx,j] != 0){
+          new_hire_amo_payment_matrix[row_indx, j] <- get_pmt(
+                                                    r = new_discount_rate[i],
+                                                    g = AmoBaseInc_CurrentHire,
+                                                    nper = new_hire_amo_period_matrix[row_indx,j],
+                                                    pv = new_hire_remaining_ual_matrix[row_indx,j],
+                                                    t=0.5)
+        }
+      }
+      
+      end_col <- min(end_col + 1, 30)
+      
+      for(k in 2:end_col){
+        curr_hire_remaining_ual_matrix[row_indx+1,k] <- curr_hire_remaining_ual_matrix[row_indx,k-1]*(1 + new_discount_rate[i]) - 
+                                              curr_hire_amo_payment_matrix[row_indx,k-1]*(1 + new_discount_rate[i])^(1/2)
         
-        proj_amo_contr <- get_amo_contr(amo_rates = c(curr_hire_ER_amo_rate[i-1], new_hire_ER_amo_rate[i-1]),
-                                        payrolls = payrolls)
+        new_hire_remaining_ual_matrix[row_indx+1,k] <- new_hire_remaining_ual_matrix[row_indx,k-1]*(1 + new_discount_rate[i]) - 
+                                              new_hire_amo_payment_matrix[row_indx,k-1]*(1 + new_discount_rate[i])^(1/2)
+      }
+      
+      curr_hire_remaining_ual_matrix[row_indx+1,1] <- curr_hire_ual_ava[i] - sum(curr_hire_remaining_ual_matrix[(row_indx+1),2:end_col])
+      new_hire_remaining_ual_matrix[row_indx+1,1] <- new_hire_ual_ava[i] - sum(new_hire_remaining_ual_matrix[(row_indx+1),2:end_col])
+      
+      # get amortization contribution rate
+      # curr_hire_actuarial_amo_rate <- get_actuarial_amo_rate(annual_amo_payment = sum(curr_hire_amo_payment_matrix[row_indx,]),
+      #                                              annual_payroll = curr_hire_payroll[i])
+    
+      # new_hire_actuarial_amo_rate <- get_actuarial_amo_rate(annual_amo_payment = sum(new_hire_amo_payment_matrix[row_indx,]),
+      #                                                        annual_payroll = new_hire_payroll[i])
+      
+      total_hire_actuarial_amo_rate <- get_actuarial_amo_rate(
+                    annual_amo_payment = sum(curr_hire_amo_payment_matrix[row_indx,]) + sum(new_hire_amo_payment_matrix[row_indx,]),
+                    annual_payroll = total_hire_payroll[i])
+      
+      # get ADC rates
+      curr_hire_adc_rate <- get_adc_rate(
+                                    # actuarial_amo_rate = curr_hire_actuarial_amo_rate,
+                                    actuarial_amo_rate = total_hire_actuarial_amo_rate,
+                                    ER_nc_rate = curr_hire_ER_nc_rate[i], admin_rate = Admin_Exp_Pct)
+      
+      new_hire_adc_rate <- get_adc_rate(
+                                    # actuarial_amo_rate = new_hire_actuarial_amo_rate,
+                                    actuarial_amo_rate = total_hire_actuarial_amo_rate,
+                                    ER_nc_rate = new_hire_ER_nc_rate[i], admin_rate = Admin_Exp_Pct)
         
-        proj_mva <- get_mva(prev_mva = total_hire_actual_mva[i], dr = new_discount_rate[i],
-                            cash_flow_excl_amo = cash_flow_excl_amo_, amo_contr = proj_amo_contr)
+      if(funding_policy == 'status quo'){
+        # determine the total contribution rate next year
+        next_year <- i + start_hist_year - 1
         
-        proj_mva_2047 <- tail(proj_mva, 1)
-        
-        funded_ratio_2047 <- get_funded_ratio_2047(mva_2047 = proj_mva_2047, aal_2047 = aal_2047)
-        
-        all_funded_ratio_2047[i-2] <- funded_ratio_2047
-        
-        # get adc/fcr ratio
-        curr_hire_adc_fcr_ratio <- get_adc_fcr_ratio(adc = curr_hire_adc_rate,
-                                                     fcr = curr_hire_ER_contr_rate[i-1])
-        
-        new_hire_adc_fcr_ratio <- get_adc_fcr_ratio(adc = new_hire_adc_rate,
-                                                    fcr = new_hire_ER_contr_rate[i-1])
-        
-        adc[i-2] <- curr_hire_adc_rate
-        adc_fcr_ratio[i-2] <- curr_hire_adc_fcr_ratio
-        
-        # check conditions
-        curr_hire_metric_status <- is_red_status(fr_2047 = funded_ratio_2047,
-                                                 adc_fcr_ratio = curr_hire_adc_fcr_ratio)
-        
-        new_hire_metric_status <- is_red_status(fr_2047 = funded_ratio_2047,
-                                                adc_fcr_ratio = new_hire_adc_fcr_ratio)
-        
-        if(curr_hire_metric_status){
-          # curr_hire_ER_contr_rate[i] <- curr_hire_actuarial_amo_rate + curr_hire_ER_nc_rate[i] + Admin_Exp_Pct
-          curr_hire_ER_contr_rate[i] <- total_hire_actuarial_amo_rate + curr_hire_ER_nc_rate[i] + Admin_Exp_Pct
-        } else{
+        if(next_year > 2047){
+          
           curr_hire_ER_contr_rate[i] <- curr_hire_ER_contr_rate[i-1]
-        }
-        
-        if(new_hire_metric_status){
-          # new_hire_ER_contr_rate[i] <- new_hire_actuarial_amo_rate + new_hire_ER_nc_rate[i] + Admin_Exp_Pct
-          new_hire_ER_contr_rate[i] <- total_hire_actuarial_amo_rate + new_hire_ER_nc_rate[i] + Admin_Exp_Pct
-        } else{
           new_hire_ER_contr_rate[i] <- new_hire_ER_contr_rate[i-1]
+          total_hire_ER_contr_rate[i] <- (curr_hire_ER_contr_rate[i] * curr_hire_payroll[i] + 
+                                            new_hire_ER_contr_rate[i] * new_hire_payroll[i]) / total_hire_payroll[i]
+          
+        } else {
+          
+          # get funded ratio in 2047
+          payrolls <- payroll_matrix[i:critical_year_indx,]
+          cash_flow_excl_amo_ <- cash_flow_excl_amo[i:critical_year_indx]
+          
+          proj_amo_contr <- get_amo_contr(amo_rates = c(curr_hire_ER_amo_rate[i-1], new_hire_ER_amo_rate[i-1]),
+                                          payrolls = payrolls)
+          
+          proj_mva <- get_mva(prev_mva = total_hire_actual_mva[i], dr = new_discount_rate[i],
+                              cash_flow_excl_amo = cash_flow_excl_amo_, amo_contr = proj_amo_contr)
+          
+          proj_mva_2047 <- tail(proj_mva, 1)
+          
+          funded_ratio_2047 <- get_funded_ratio_2047(mva_2047 = proj_mva_2047, aal_2047 = aal_2047)
+          
+          all_funded_ratio_2047[i-2] <- funded_ratio_2047
+          
+          # get adc/fcr ratio
+          curr_hire_adc_fcr_ratio <- get_adc_fcr_ratio(adc = curr_hire_adc_rate,
+                                                       fcr = curr_hire_ER_contr_rate[i-1])
+          
+          new_hire_adc_fcr_ratio <- get_adc_fcr_ratio(adc = new_hire_adc_rate,
+                                                      fcr = new_hire_ER_contr_rate[i-1])
+          
+          adc[i-2] <- curr_hire_adc_rate
+          adc_fcr_ratio[i-2] <- curr_hire_adc_fcr_ratio
+          
+          # check conditions
+          curr_hire_metric_status <- is_red_status(fr_2047 = funded_ratio_2047,
+                                                   adc_fcr_ratio = curr_hire_adc_fcr_ratio)
+          
+          new_hire_metric_status <- is_red_status(fr_2047 = funded_ratio_2047,
+                                                  adc_fcr_ratio = new_hire_adc_fcr_ratio)
+          
+          if(curr_hire_metric_status){
+            # curr_hire_ER_contr_rate[i] <- curr_hire_actuarial_amo_rate + curr_hire_ER_nc_rate[i] + Admin_Exp_Pct
+            curr_hire_ER_contr_rate[i] <- total_hire_actuarial_amo_rate + curr_hire_ER_nc_rate[i] + Admin_Exp_Pct
+          } else{
+            curr_hire_ER_contr_rate[i] <- curr_hire_ER_contr_rate[i-1]
+          }
+          
+          if(new_hire_metric_status){
+            # new_hire_ER_contr_rate[i] <- new_hire_actuarial_amo_rate + new_hire_ER_nc_rate[i] + Admin_Exp_Pct
+            new_hire_ER_contr_rate[i] <- total_hire_actuarial_amo_rate + new_hire_ER_nc_rate[i] + Admin_Exp_Pct
+          } else{
+            new_hire_ER_contr_rate[i] <- new_hire_ER_contr_rate[i-1]
+          }
+          
+          total_hire_ER_contr_rate[i] <- (curr_hire_ER_contr_rate[i] * curr_hire_payroll[i] + 
+                                            new_hire_ER_contr_rate[i] * new_hire_payroll[i]) / total_hire_payroll[i]
+          
         }
+      } else if (funding_policy == 'ADC') {
+        # curr_hire_ER_contr_rate[i] <- curr_hire_actuarial_amo_rate + curr_hire_ER_nc_rate[i] + Admin_Exp_Pct
+        # new_hire_ER_contr_rate[i] <- new_hire_actuarial_amo_rate + new_hire_ER_nc_rate[i] + Admin_Exp_Pct
+        
+        curr_hire_ER_contr_rate[i] <- total_hire_actuarial_amo_rate + curr_hire_ER_nc_rate[i] + Admin_Exp_Pct
+        new_hire_ER_contr_rate[i] <- total_hire_actuarial_amo_rate + new_hire_ER_nc_rate[i] + Admin_Exp_Pct
         
         total_hire_ER_contr_rate[i] <- (curr_hire_ER_contr_rate[i] * curr_hire_payroll[i] + 
                                           new_hire_ER_contr_rate[i] * new_hire_payroll[i]) / total_hire_payroll[i]
         
       }
-    } else if (funding_policy == 'ADC') {
-      # curr_hire_ER_contr_rate[i] <- curr_hire_actuarial_amo_rate + curr_hire_ER_nc_rate[i] + Admin_Exp_Pct
-      # new_hire_ER_contr_rate[i] <- new_hire_actuarial_amo_rate + new_hire_ER_nc_rate[i] + Admin_Exp_Pct
-      
-      curr_hire_ER_contr_rate[i] <- total_hire_actuarial_amo_rate + curr_hire_ER_nc_rate[i] + Admin_Exp_Pct
-      new_hire_ER_contr_rate[i] <- total_hire_actuarial_amo_rate + new_hire_ER_nc_rate[i] + Admin_Exp_Pct
-      
-      total_hire_ER_contr_rate[i] <- (curr_hire_ER_contr_rate[i] * curr_hire_payroll[i] + 
-                                        new_hire_ER_contr_rate[i] * new_hire_payroll[i]) / total_hire_payroll[i]
-      
     }
-  }
-    output <- data.frame(sapply(colnames(historical_data), get, envir = sys.frame(sys.parent(0))))
+      output <- data.frame(sapply(colnames(historical_data), get, envir = sys.frame(sys.parent(0))))
 
     return(output)
 }

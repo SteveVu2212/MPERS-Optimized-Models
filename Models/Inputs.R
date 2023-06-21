@@ -1,12 +1,12 @@
 
 # 1. Economic and Actuarial assumptions
-payroll_growth_ <- 0.0265
+payroll_growth_ <- 0.0265 # in 2022's updated experience study, recommend to remain unchanged
 pop_growth_ <- 0
-assum_inflation_ <- 0.024
+assum_inflation_ <- 0.024 # in 2022's updated experience study, recommend to remain unchanged
 assum_inv_return_ <- 0.0755
 curr_discount_rate_ <- 0.0755
 new_discount_rate_ <- 0.0755
-retire_refund_ratio_ <- 0.6
+retire_refund_ratio_ <- 0.6 # in 2022's updated experience study, recommend to increase to 65%
 roa_scenario_ <-'Assumption'
 analysis_type_ <- 'Deterministic'
 funding_policy_ <- 'status quo'
@@ -15,11 +15,11 @@ funding_policy_ <- 'status quo'
 
 
 # 2. Plan design
-credited_interest_ <- 0.02
+credited_interest_ <- 0.02 # in 2022's updated experience study, recommend to remain unchanged
 ee_contr_rate_ <- 0.09
 cola_ <- 0.03
 req_er_contr_pct <- 0.86
-Admin_Exp_Pct <- 0.0028
+Admin_Exp_Pct <- 0.0028 # in 2022's updated experience study, recommend to reduce to 0.26% of payroll
 AmoBaseInc_CurrentHire <- 0.0265
 AmoBaseInc_NewHire <- 0.0265
 

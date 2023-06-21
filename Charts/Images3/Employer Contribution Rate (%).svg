@@ -1,0 +1,80 @@
+<svg width="769" height="400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" baseProfile="full" viewBox="0 0 769 400">
+<rect width="769" height="400" x="0" y="0" id="0" fill="rgb(0,0,0)" fill-opacity="0"></rect>
+<path d="M76.9 360.5L730.55 360.5" fill="none" stroke="#E0E6F1"></path>
+<path d="M76.9 311.5L730.55 311.5" fill="none" stroke="#E0E6F1"></path>
+<path d="M76.9 262.5L730.55 262.5" fill="none" stroke="#E0E6F1"></path>
+<path d="M76.9 214.5L730.55 214.5" fill="none" stroke="#E0E6F1"></path>
+<path d="M76.9 165.5L730.55 165.5" fill="none" stroke="#E0E6F1"></path>
+<path d="M76.9 116.5L730.55 116.5" fill="none" stroke="#E0E6F1"></path>
+<path d="M76.9 68.5L730.55 68.5" fill="none" stroke="#E0E6F1"></path>
+<path d="M76.9 360.5L730.55 360.5" fill="none" stroke="#d3d3d3bf" stroke-linecap="round"></path>
+<path d="M76.9 360.5L46.9 360.5" fill="none" stroke="#d3d3d3bf"></path>
+<path d="M76.9 311.5L46.9 311.5" fill="none" stroke="#d3d3d3bf"></path>
+<path d="M76.9 262.5L46.9 262.5" fill="none" stroke="#d3d3d3bf"></path>
+<path d="M76.9 214.5L46.9 214.5" fill="none" stroke="#d3d3d3bf"></path>
+<path d="M76.9 165.5L46.9 165.5" fill="none" stroke="#d3d3d3bf"></path>
+<path d="M76.9 116.5L46.9 116.5" fill="none" stroke="#d3d3d3bf"></path>
+<path d="M76.9 68.5L46.9 68.5" fill="none" stroke="#d3d3d3bf"></path>
+<path d="M87.5 360L87.5 365" fill="none" stroke="#d3d3d3bf"></path>
+<path d="M169.5 360L169.5 365" fill="none" stroke="#d3d3d3bf"></path>
+<path d="M250.5 360L250.5 365" fill="none" stroke="#d3d3d3bf"></path>
+<path d="M332.5 360L332.5 365" fill="none" stroke="#d3d3d3bf"></path>
+<path d="M414.5 360L414.5 365" fill="none" stroke="#d3d3d3bf"></path>
+<path d="M495.5 360L495.5 365" fill="none" stroke="#d3d3d3bf"></path>
+<path d="M577.5 360L577.5 365" fill="none" stroke="#d3d3d3bf"></path>
+<path d="M659.5 360L659.5 365" fill="none" stroke="#d3d3d3bf"></path>
+<path d="M720.5 360L720.5 365" fill="none" stroke="#d3d3d3bf"></path>
+<text dominant-baseline="central" text-anchor="start" style="font-size:14px;font-family:'Open Sans', sans-serif;" y="-9" transform="translate(46.9 360)" fill="#333">0%</text>
+<text dominant-baseline="central" text-anchor="start" style="font-size:14px;font-family:'Open Sans', sans-serif;" y="-9" transform="translate(46.9 311.3333)" fill="#333">10%</text>
+<text dominant-baseline="central" text-anchor="start" style="font-size:14px;font-family:'Open Sans', sans-serif;" y="-9" transform="translate(46.9 262.6667)" fill="#333">20%</text>
+<text dominant-baseline="central" text-anchor="start" style="font-size:14px;font-family:'Open Sans', sans-serif;" y="-9" transform="translate(46.9 214)" fill="#333">30%</text>
+<text dominant-baseline="central" text-anchor="start" style="font-size:14px;font-family:'Open Sans', sans-serif;" y="-9" transform="translate(46.9 165.3333)" fill="#333">40%</text>
+<text dominant-baseline="central" text-anchor="start" style="font-size:14px;font-family:'Open Sans', sans-serif;" y="-9" transform="translate(46.9 116.6667)" fill="#333">50%</text>
+<text dominant-baseline="central" text-anchor="start" style="font-size:14px;font-family:'Open Sans', sans-serif;" y="-9" transform="translate(46.9 68)" fill="#333">60%</text>
+<text dominant-baseline="central" text-anchor="middle" style="font-size:14px;font-family:'Open Sans', sans-serif;" y="7" transform="translate(87.1133 368)" fill="#333">2021</text>
+<text dominant-baseline="central" text-anchor="middle" style="font-size:14px;font-family:'Open Sans', sans-serif;" y="7" transform="translate(168.8195 368)" fill="#333">2025</text>
+<text dominant-baseline="central" text-anchor="middle" style="font-size:14px;font-family:'Open Sans', sans-serif;" y="7" transform="translate(250.5258 368)" fill="#333">2029</text>
+<text dominant-baseline="central" text-anchor="middle" style="font-size:14px;font-family:'Open Sans', sans-serif;" y="7" transform="translate(332.232 368)" fill="#333">2033</text>
+<text dominant-baseline="central" text-anchor="middle" style="font-size:14px;font-family:'Open Sans', sans-serif;" y="7" transform="translate(413.9383 368)" fill="#333">2037</text>
+<text dominant-baseline="central" text-anchor="middle" style="font-size:14px;font-family:'Open Sans', sans-serif;" y="7" transform="translate(495.6445 368)" fill="#333">2041</text>
+<text dominant-baseline="central" text-anchor="middle" style="font-size:14px;font-family:'Open Sans', sans-serif;" y="7" transform="translate(577.3508 368)" fill="#333">2045</text>
+<text dominant-baseline="central" text-anchor="middle" style="font-size:14px;font-family:'Open Sans', sans-serif;" y="7" transform="translate(659.057 368)" fill="#333">2049</text>
+<text dominant-baseline="central" text-anchor="middle" style="font-size:14px;font-family:'Open Sans', sans-serif;" y="7" transform="translate(720.3367 368)" fill="#333">2052</text>
+<g clip-path="url(#zr0-c0)">
+<path d="M87.1133 275.32L107.5398 275.32L127.9664 251.2414L148.393 247.8043L168.8195 244.5149L189.2461 244.5037L209.6727 244.4945L230.0992 244.4863L250.5258 238.8634L270.9523 232.6691L291.3789 232.6676L311.8055 232.6663L332.232 232.6651L352.6586 232.6642L373.0851 232.6635L393.5117 222.9991L413.9383 222.6265L434.3648 222.2926L454.7914 219.7298L475.218 219.7277L495.6445 219.7254L516.0711 207.248L536.4977 207.0752L556.9242 204.9881L577.3508 205.0083L597.7773 205.0518L618.2039 190.326L638.6305 190.1883L659.057 190.0914L679.4836 190.0153L699.9102 189.8482L720.3367 189.7209" fill="none" stroke="#ff6633" stroke-width="3.5" stroke-linejoin="bevel"></path>
+</g>
+<g clip-path="url(#zr0-c1)">
+<path d="M87.1133 275.32L107.5398 275.32L127.9664 251.2414L148.393 247.8043L168.8195 244.5149L189.2461 243.7189L209.6727 236.8842L230.0992 235.2452L250.5258 233.5646L270.9523 232.1413L291.3789 230.7585L311.8055 229.3318L332.232 227.8963L352.6586 226.4355L373.0851 224.9635L393.5117 223.5196L413.9383 222.0163L434.3648 220.4959L454.7914 218.963L475.218 217.4208L495.6445 215.8871L516.0711 211.7756L536.4977 207.075L556.9242 202.2078L577.3508 201.6383L597.7773 199.7881L618.2039 197.976L638.6305 196.3372L659.057 283.0373L679.4836 288.1296L699.9102 291.2375L720.3367 295.353" fill="none" stroke="#2879cb" stroke-width="3.5" stroke-linejoin="bevel"></path>
+</g>
+<g clip-path="url(#zr0-c2)">
+<path d="M87.1133 275.32L107.5398 275.32L127.9664 251.2414L148.393 218.2773L168.8195 203.4205L189.2461 192.0414L209.6727 177.3286L230.0992 177.282L250.5258 177.2415L270.9523 177.2072L291.3789 177.1624L311.8055 177.1253L332.232 177.0916L352.6586 177.0656L373.0851 177.0438L393.5117 177.0116L413.9383 176.987L434.3648 173.4175L454.7914 155.6732L475.218 140.6156L495.6445 140.5061L516.0711 112.1314L536.4977 112.0445L556.9242 111.9795L577.3508 111.9262L597.7773 111.8116L618.2039 111.7255L638.6305 111.6496L659.057 111.5961L679.4836 111.5541L699.9102 111.462L720.3367 111.3917" fill="none" stroke="#2e3745" stroke-width="3.5" stroke-linejoin="bevel"></path>
+</g>
+<g clip-path="url(#zr0-c3)">
+<path d="M87.1133 275.32L107.5398 275.32L127.9664 251.2414L148.393 218.2773L168.8195 203.4205L189.2461 192.0414L209.6727 177.3286L230.0992 172.3651L250.5258 172.6726L270.9523 173.0213L291.3789 172.9814L311.8055 172.6159L332.232 173.2922L352.6586 174.1177L373.0851 175.0822L393.5117 176.1694L413.9383 177.3476L434.3648 176.0511L454.7914 158.0511L475.218 143.0444L495.6445 128.1658L516.0711 114.4585L536.4977 103.8838L556.9242 100.5139L577.3508 101.2875L597.7773 100.3502L618.2039 98.4884L638.6305 96.6833L659.057 212.6479L679.4836 231.0523L699.9102 247.3985L720.3367 261.1738" fill="none" stroke="#f6b941" stroke-width="3.5" stroke-linejoin="bevel"></path>
+</g>
+<path d="M-5 -5.5l681.3359 0l0 25l-681.3359 0Z" transform="translate(48.832 29.5)" fill="rgb(0,0,0)" fill-opacity="0" stroke="#ccc" stroke-width="0"></path>
+<path d="M19.5 7A7 7 0 1 1 19.5 6.9993" transform="translate(43.332 29.5)" fill="#ff6633"></path>
+<text dominant-baseline="central" text-anchor="start" style="font-size:11px;font-family:'Open Sans', sans-serif;" xml:space="preserve" x="30" y="7" transform="translate(43.332 29.5)" fill="#333">Status Quo - Assumed Return</text>
+<path d="M19.5 7A7 7 0 1 1 19.5 6.9993" transform="translate(223.8457 29.5)" fill="#2879cb"></path>
+<text dominant-baseline="central" text-anchor="start" style="font-size:11px;font-family:'Open Sans', sans-serif;" xml:space="preserve" x="30" y="7" transform="translate(223.8457 29.5)" fill="#333">ADEC - Assumed Return</text>
+<path d="M19.5 7A7 7 0 1 1 19.5 6.9993" transform="translate(375.5864 29.5)" fill="#2e3745"></path>
+<text dominant-baseline="central" text-anchor="start" style="font-size:11px;font-family:'Open Sans', sans-serif;" xml:space="preserve" x="30" y="7" transform="translate(375.5864 29.5)" fill="#333">Status Quo - Double Recession</text>
+<path d="M19.5 7A7 7 0 1 1 19.5 6.9993" transform="translate(562.0137 29.5)" fill="#f6b941"></path>
+<text dominant-baseline="central" text-anchor="start" style="font-size:11px;font-family:'Open Sans', sans-serif;" xml:space="preserve" x="30" y="7" transform="translate(562.0137 29.5)" fill="#333">ADEC - Double Recession</text>
+<path d="M-5 -5l325.4492 0l0 30l-325.4492 0Z" transform="translate(5 5)" fill="rgb(0,0,0)" fill-opacity="0" stroke="#ccc" stroke-width="0"></path>
+<text dominant-baseline="central" text-anchor="start" style="font-size:20px;font-family:'Open Sans', sans-serif;font-weight:700;" xml:space="preserve" y="10" transform="translate(5 5)" fill="#464646">Employer Contribution Rate (%)</text>
+<defs >
+<clipPath id="zr0-c0">
+<path d="M75 66.25l657 0l0 295.5l-657 0Z" fill="#000"></path>
+</clipPath>
+<clipPath id="zr0-c1">
+<path d="M75 66.25l657 0l0 295.5l-657 0Z" fill="#000"></path>
+</clipPath>
+<clipPath id="zr0-c2">
+<path d="M75 66.25l657 0l0 295.5l-657 0Z" fill="#000"></path>
+</clipPath>
+<clipPath id="zr0-c3">
+<path d="M75 66.25l657 0l0 295.5l-657 0Z" fill="#000"></path>
+</clipPath>
+</defs>
+</svg>

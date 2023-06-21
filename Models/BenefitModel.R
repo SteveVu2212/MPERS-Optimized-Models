@@ -287,6 +287,11 @@ separation_rate <- expand_grid(age=age_range, yos=yos_range, entry_year=entry_ye
   select(entry_year, entry_age, age, yos, sep_rate, remaining_prob, separation_prob)
 
 
+# curr_discount_rate = 0.0755
+# new_discount_rate = 0.0755
+# cola = 0.03
+# retire_refund_ratio = 0.6
+
 get_benefit_data <- function(
     curr_discount_rate,
     new_discount_rate,
