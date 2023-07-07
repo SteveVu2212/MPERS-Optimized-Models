@@ -64,12 +64,19 @@ get_funding_data <- function(
     curr_discount_rate[first_proj_yr_idx:period] <- rep(curr_disc_rate, proj_length)
     new_discount_rate[first_proj_yr_idx:period] <- rep(new_disc_rate, proj_length)
     
+    assumption_return <- rep(curr_disc_rate, period - first_proj_yr_idx + 1)
+    recurring_recession_return <- c(c(-0.24, 0.11, 0.11, 0.11), rep(curr_disc_rate, 11), c(-0.24, 0.11, 0.11, 0.11), rep(curr_disc_rate, 11))
+    
     # Investment return scenario
     # scenario_index <- which(colnames(scenario_data) == as.character(ScenType))
-    if(analysis_type == 'Stochastic'){
+    if(analysis_type == 'Stochastic') {
       roa_mva[first_proj_yr_idx:period] <- rnorm(proj_length, SimReturnAssumed, SimVolatility)
     } else if (analysis_type == 'Deterministic') {
-      roa_mva[first_proj_yr_idx:period] <- c(scenario_data[first_proj_yr_idx:period, roa_scenario][[roa_scenario]])
+      if(roa_scenario == "Assumption") {
+        roa_mva[first_proj_yr_idx:period] <- assumption_return
+      } else {
+        roa_mva[first_proj_yr_idx:period] <- recurring_recession_return
+      }
     }
     
     # Payroll
